@@ -1,6 +1,6 @@
 import React, { useState, useRef, useMemo } from 'react';
 
-const Draggable = ({ positions, onPositionUpdate = () => { }, onSelect = () => { }, children }) => {
+const Draggable = ({ positions, onPositionUpdate = () => { }, onSelect = () => { }, onDeselect = () => { }, children }) => {
     const [position, setPosition] = useState({ x: positions.x, y: positions.y });
     const [isDragging, setIsDragging] = useState(false);
     const [isSelected, setIsSelected] = useState(false);
@@ -58,6 +58,8 @@ const Draggable = ({ positions, onPositionUpdate = () => { }, onSelect = () => {
                 setIsSelected(val => !val)
                 if (isSelected === false)
                     onSelect()
+                else
+                    onDeselect()
             }}
         >
             {children}

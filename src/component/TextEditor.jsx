@@ -1,12 +1,13 @@
 import React, { useEffect, useState } from 'react'
 import '../styles/TextEditor.css'
 import TextCanvas from './TextCanvas';
+import EditTextBar from './EditTextBar';
 
 function TextEditor() {
     const [history, setHistory] = useState([[]])
     const [historyIndex, setHistoryIndex] = useState(0)
     const [texts, setTexts] = useState([]);
-    const [selectedText, setSelectedText] = useState()
+    const [selectedText, setSelectedText] = useState(null)
 
     function undo() {
         if (historyIndex > 0) {
@@ -48,8 +49,21 @@ function TextEditor() {
                 setTexts(newTexts)
                 updateHistory(newTexts)
             }} />
-            <TextCanvas texts={texts} onChange={newTexts => updateHistory(newTexts)} onSelectText={text => setSelectedText(text)} />
-            
+            <TextCanvas texts={texts} onChange={newTexts => updateHistory(newTexts)} onSelectText={text => setSelectedText(text)} onDeselectText={() => setSelectedText(null)} />
+            {selectedText && <EditTextBar
+                text={selectedText}
+                onChange={text => {
+                    let newTexts = texts.map(e => e.id === text.id ? text : e);
+                    setTexts(newTexts)
+                    setSelectedText(text)
+                    updateHistory(newTexts)
+                }}
+                onDelete={() => {
+                    let newTexts = texts.filter(e => e.id !== selectedText.id);
+                    setTexts(newTexts)
+                    setSelectedText(null)
+                    updateHistory(newTexts)
+                }} />}
         </>
     )
 }

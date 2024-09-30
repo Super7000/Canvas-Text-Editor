@@ -28,13 +28,16 @@
     margin-bottom: 1em;
 }
 
-.text {
-    cursor: move;
-}
-
 .undo-redo-container {
     display: flex;
     gap: 0.5rem;
     justify-content: center;
     margin-bottom: 1rem;
+}
+
+.edit-text-bar {
+    display: flex;
+    gap: 0.5rem;
+    justify-content: center;
+    margin-top: 1rem;
 }

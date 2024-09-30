@@ -1,7 +1,7 @@
 import React from "react";
 import Draggable from "./Dragable";
 
-function TextCanvas({ texts = [], onChange = () => { }, onSelectText = () => { } }) {
+function TextCanvas({ texts = [], onChange = () => { }, onSelectText = () => { }, onDeselectText = () => { } }) {
     return (
         <div className='text-canvas'>
             <div style={{ position: 'relative' }}>
@@ -15,9 +15,8 @@ function TextCanvas({ texts = [], onChange = () => { }, onSelectText = () => { }
                                 console.log(newTexts)
                                 onChange(newTexts)
                             }}
-                            onSelect={(text) => {
-                                onSelectText(text)
-                            }} />
+                            onSelect={text => onSelectText(text)}
+                            onDeselect={text => onDeselectText(text)} />
                     ))
                 }
             </div>
@@ -25,12 +24,13 @@ function TextCanvas({ texts = [], onChange = () => { }, onSelectText = () => { }
     )
 }
 
-function Text({ text, onTextMove, onSelect = () => { } }) {
+function Text({ text, onTextMove, onSelect = () => { }, onDeselect = () => { } }) {
     return (
         <Draggable
             positions={{ x: text.x, y: text.y }}
             onPositionUpdate={(newPositions) => onTextMove({ ...text, x: newPositions.x, y: newPositions.y })}
             onSelect={() => onSelect(text)}
+            onDeselect={() => onDeselect(text)}
         >
             <span className='text' style={{
                 fontSize: text.fontSize,
