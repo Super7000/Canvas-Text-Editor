@@ -33,22 +33,25 @@ function TextEditor() {
 
     return (
         <>
-            <UndoRedoBtns onUndo={undo} onRedo={redo} />
-            <AddText onAddText={text => {
-                let newTexts = [...texts, {
-                    id: Date.now(),
-                    content: text,
-                    x: 10,
-                    y: texts.length * 16 + 10,
-                    fontSize: 16,
-                    isBold: false,
-                    isItalic: false,
-                    isUnderline: false,
-                    isStrikethrough: false,
-                }]
-                setTexts(newTexts)
-                updateHistory(newTexts)
-            }} />
+            <div style={{ display: 'flex', width: '100%', justifyContent: 'space-between', marginBottom: '1rem' }}>
+                <UndoRedoBtns onUndo={undo} onRedo={redo} />
+                <AddText onAddText={text => {
+                    let newTexts = [...texts, {
+                        id: Date.now(),
+                        content: text,
+                        x: 10,
+                        y: texts.length * 16 + 10,
+                        fontSize: 16,
+                        fontFamily: 'Arial',
+                        isBold: false,
+                        isItalic: false,
+                        isUnderline: false,
+                        isStrikethrough: false,
+                    }]
+                    setTexts(newTexts)
+                    updateHistory(newTexts)
+                }} />
+            </div>
             <TextCanvas texts={texts} onChange={newTexts => updateHistory(newTexts)} onSelectText={text => setSelectedText(text)} onDeselectText={() => setSelectedText(null)} />
             {selectedText && <EditTextBar
                 text={selectedText}

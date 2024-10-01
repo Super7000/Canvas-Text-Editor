@@ -1,48 +1,73 @@
-import React, { useState, useRef, useMemo } from 'react';
+import React, { useState, useRef, useEffect, useCallback } from 'react';
 
-const Draggable = ({ positions, onPositionUpdate = () => { }, onSelect = () => { }, onDeselect = () => { }, children }) => {
+const Draggable = ({ canvas, positions, onPositionUpdate = () => { }, onSelect = () => { }, onDeselect = () => { }, children }) => {
     const [position, setPosition] = useState({ x: positions.x, y: positions.y });
     const [isDragging, setIsDragging] = useState(false);
     const [isSelected, setIsSelected] = useState(false);
     const dragRef = useRef(null);
 
-    const handleMouseDown = (e) => {
+    const handleMouseDown = useCallback((e) => {
         setIsDragging(true);
-
         dragRef.current = {
             startX: e.clientX - position.x,
             startY: e.clientY - position.y,
         };
-    };
+    }, [position]);
 
-    const handleMouseMove = (e) => {
+    const handleMouseMove = useCallback((e) => {
         if (!isDragging) return;
 
         const newX = e.clientX - dragRef.current.startX;
         const newY = e.clientY - dragRef.current.startY;
 
+        // Boundary checks
+        const canvasRect = canvas.getBoundingClientRect();
+        if (newX < 0 || newY < 0 || newX > canvasRect.width || newY > canvasRect.height) {
+            return;
+        }
+
         setPosition({ x: newX, y: newY });
-    };
+    }, [isDragging, canvas]);
 
-    const handleMouseUp = () => {
+    const handleMouseUp = useCallback(() => {
         setIsDragging(false);
-        if (positions.x === position.x && positions.y === position.y) return
-        onPositionUpdate(position)
-    };
+        if (positions.x !== position.x || positions.y !== position.y) {
+            onPositionUpdate(position);
+        }
+    }, [positions, position, onPositionUpdate]);
 
-    useMemo(() => {
-        setPosition({
-            x: positions.x,
-            y: positions.y
-        })
-    }, [positions])
+    useEffect(() => {
+        setPosition({ x: positions.x, y: positions.y });
+    }, [positions]);
+
+    useEffect(() => {
+        if (isDragging) {
+            document.addEventListener('mousemove', handleMouseMove);
+            document.addEventListener('mouseup', handleMouseUp);
+        } else {
+            document.removeEventListener('mousemove', handleMouseMove);
+            document.removeEventListener('mouseup', handleMouseUp);
+        }
+
+        return () => {
+            document.removeEventListener('mousemove', handleMouseMove);
+            document.removeEventListener('mouseup', handleMouseUp);
+        };
+    }, [isDragging, handleMouseMove, handleMouseUp]);
+
+    const handleClick = useCallback(() => {
+        setIsSelected((prev) => !prev);
+        if (!isSelected) {
+            onSelect();
+        } else {
+            onDeselect();
+        }
+    }, [isSelected, onSelect, onDeselect]);
 
     return (
         <span
             onMouseDown={handleMouseDown}
-            onMouseMove={handleMouseMove}
-            onMouseUp={handleMouseUp}
-            onMouseLeave={handleMouseUp}
+            onClick={handleClick}
             style={{
                 position: 'absolute',
                 left: `${position.x}px`,
@@ -52,14 +77,7 @@ const Draggable = ({ positions, onPositionUpdate = () => { }, onSelect = () => {
                 backgroundColor: isDragging ? 'rgba(0,0,0,0.1)' : 'rgba(0,0,0,0)',
                 borderRadius: '4px',
                 userSelect: 'none',
-                border: isSelected ? '1px solid dodgerblue' : 'none'
-            }}
-            onClick={() => {
-                setIsSelected(val => !val)
-                if (isSelected === false)
-                    onSelect()
-                else
-                    onDeselect()
+                border: isSelected ? '1px solid dodgerblue' : 'none',
             }}
         >
             {children}
