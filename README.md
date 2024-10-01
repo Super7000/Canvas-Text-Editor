@@ -1,3 +1,7 @@
+# Canvas-Text-Editor
+
+It's simple canvas text editor app created using ReactJS, here user can add, remove text also change there font-family, font-style and font-size.
+
 # React + Vite
 
 This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
